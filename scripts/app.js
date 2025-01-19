@@ -55,6 +55,11 @@ function setupShaders() {
   const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
   const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
+  if (!vertexShader || !fragmentShader) {
+    console.error("Failed to create shaders.");
+    return;
+  }
+
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
@@ -62,7 +67,7 @@ function setupShaders() {
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     console.error("Program link failed:", gl.getProgramInfoLog(program));
-    return null;
+    return;
   }
 
   gl.useProgram(program);
@@ -102,25 +107,29 @@ function renderSquare(shape) {
 }
 
 function renderTriangle(shape) {
-  const a_Position = gl.getAttribLocation(gl.program, "a_Position");
-  const u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
-
-  const halfSize = shape.size / 200;
-  const vertices = new Float32Array([
-    shape.position[0], shape.position[1] + halfSize,
-    shape.position[0] - halfSize, shape.position[1] - halfSize,
-    shape.position[0] + halfSize, shape.position[1] - halfSize,
-  ]);
-
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-  gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(a_Position);
-
-  gl.uniform4fv(u_FragColor, shape.color);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
-}
+    const a_Position = gl.getAttribLocation(gl.program, "a_Position");
+    const u_FragColor = gl.getUniformLocation(gl.program, "u_FragColor");
+  
+    // Dynamically calculate vertices if `vertices` are not provided
+    const halfSize = shape.size / 200;
+    const vertices = shape.vertices
+      ? new Float32Array(shape.vertices)
+      : new Float32Array([
+          shape.position[0], shape.position[1] + halfSize, // Top vertex
+          shape.position[0] - halfSize, shape.position[1] - halfSize, // Bottom-left vertex
+          shape.position[0] + halfSize, shape.position[1] - halfSize, // Bottom-right vertex
+        ]);
+  
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(a_Position);
+  
+    gl.uniform4fv(u_FragColor, shape.color);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  
 
 function renderCircle(shape) {
   const a_Position = gl.getAttribLocation(gl.program, "a_Position");
@@ -145,13 +154,51 @@ function renderCircle(shape) {
   gl.drawArrays(gl.TRIANGLE_FAN, 0, shape.segments + 1);
 }
 
+function drawIceCreamCone() {
+  shapesList = [];
+
+  // Scoops
+  shapesList.push({
+    type: "circle",
+    position: [0, -0.2],
+    size: 50,
+    segments: 20,
+    color: [0.9, 0.3, 0.3, 1.0],
+  });
+
+  shapesList.push({
+    type: "circle",
+    position: [0, 0.2],
+    size: 50,
+    segments: 20,
+    color: [0.3, 0.6, 0.9, 1.0],
+  });
+
+  shapesList.push({
+    type: "circle",
+    position: [0, 0.6],
+    size: 50,
+    segments: 20,
+    color: [0.8, 0.8, 0.3, 1.0],
+  });
+
+  // Cone
+  shapesList.push({
+    type: "triangle",
+    vertices: [0, -0.8, -0.3, -0.4, 0.3, -0.4],
+    color: [0.8, 0.5, 0.2, 1.0],
+  });
+
+  renderAllShapes();
+}
+
 function handleMouseDown(event) {
   isDrawing = true;
-  handleClick(event); // Draw the first shape on mousedown
+  handleClick(event);
 }
 
 function handleMouseMove(event) {
-  if (!isDrawing) return; // Only draw when the mouse is held down
+  if (!isDrawing) return;
   handleClick(event);
 }
 
@@ -215,11 +262,13 @@ function setupUI() {
     currentShape = "circle";
   });
 
+  document.getElementById("drawIceCreamButton").addEventListener("click", drawIceCreamCone);
+
   const canvas = document.getElementById("drawingCanvas");
   canvas.addEventListener("mousedown", handleMouseDown);
   canvas.addEventListener("mousemove", handleMouseMove);
   canvas.addEventListener("mouseup", handleMouseUp);
-  canvas.addEventListener("mouseleave", handleMouseUp); // Stop drawing if the mouse leaves the canvas
+  canvas.addEventListener("mouseleave", handleMouseUp);
 }
 
 function main() {
@@ -227,8 +276,11 @@ function main() {
   setupShaders();
   setupUI();
 
-  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Black background
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
 main();
+
+
+
