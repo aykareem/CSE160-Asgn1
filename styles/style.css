@@ -1,0 +1,32 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1 {
+    margin: 20px 0;
+  }
+  
+  canvas {
+    border: 1px solid #000;
+    margin: 20px auto;
+    display: block;
+  }
+  
+  #controls {
+    margin-top: 20px;
+  }
+  
+  button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+  
+  input[type="range"] {
+    margin: 0 5px;
+  }
+  

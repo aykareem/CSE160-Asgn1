@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Program</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <h1>Paint Program</h1>
+  <canvas id="drawingCanvas" width="800" height="800" style="background-color: black;"></canvas>
+  
+  <div id="controls">
+    <button id="clearButton">Clear Canvas</button>
+    
+    <div id="drawingMode">
+      <label>Drawing Mode:</label>
+      <button id="squareButton">Squares</button>
+      <button id="triangleButton">Triangles</button>
+      <button id="circleButton">Circles</button>
+    </div>
+    
+    <div id="colorControls">
+      <label>Shape Color:</label>
+      <div>
+        <label>Red</label>
+        <input type="range" id="redSlider" min="0" max="255" value="255">
+        <label>Green</label>
+        <input type="range" id="greenSlider" min="0" max="255" value="128">
+        <label>Blue</label>
+        <input type="range" id="blueSlider" min="0" max="255" value="255">
+      </div>
+    </div>
+
+    <div id="sizeControls">
+      <label>Shape Size:</label>
+      <input type="range" id="sizeSlider" min="1" max="100" value="20">
+      <label>(Circles) Segment Count:</label>
+      <input type="range" id="segmentSlider" min="3" max="50" value="10">
+    </div>
+  </div>
+
+  <script src="scripts/app.js"></script>
+</body>
+</html>
+
